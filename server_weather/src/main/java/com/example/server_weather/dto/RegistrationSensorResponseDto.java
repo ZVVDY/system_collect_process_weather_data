@@ -1,9 +1,10 @@
-package com.example.sensor_weather.dto;
+package com.example.server_weather.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.UUID;
+
 @Getter
 @Setter
 public class RegistrationSensorResponseDto {

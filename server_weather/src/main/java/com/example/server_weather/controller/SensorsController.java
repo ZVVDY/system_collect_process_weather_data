@@ -1,6 +1,6 @@
 package com.example.server_weather.controller;
 
-import com.example.server_weather.dto.RegistrationResponse;
+import com.example.server_weather.dto.RegistrationSensorResponseDto;
 import com.example.server_weather.dto.SensorRegistrationDto;
 import com.example.server_weather.exeption.SensorRegistrationException;
 import com.example.server_weather.service.MeasurementService;
@@ -16,18 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/sensors")
 public class SensorsController {
+
     @Autowired
     private SensorService sensorService;
-    @Autowired
-    private MeasurementService measurementService;
 
-    //(value = "/registration")
     @PostMapping("registration")
-    public ResponseEntity<RegistrationResponse> registerSensor(@RequestBody SensorRegistrationDto sensorDTO) {
+    public ResponseEntity<RegistrationSensorResponseDto> registerSensor(@RequestBody SensorRegistrationDto sensorDTO) {
         try {
-            return new ResponseEntity<>(sensorService.saveSensorToServer(sensorDTO), HttpStatus.CREATED);
+           RegistrationSensorResponseDto response = new RegistrationSensorResponseDto();
+            response.setSensorKey(sensorService.saveSensorToServer(sensorDTO));
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (SensorRegistrationException e) {
-            return new ResponseEntity<>(sensorService.saveSensorToServer(sensorDTO), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 //    @GetMapping
