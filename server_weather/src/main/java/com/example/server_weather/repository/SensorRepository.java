@@ -9,7 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface SensorRepository extends JpaRepository<Sensor, UUID> {
-    List<Sensor> findByIsActiveIsTrue (boolean active);
+    List<Sensor> findByActiveIsTrue ();
     boolean existsByName(String name);
-
 }

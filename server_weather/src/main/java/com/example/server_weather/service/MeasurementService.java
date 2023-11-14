@@ -12,6 +12,6 @@ public interface MeasurementService {
 
     List<Measurement> getSensorMeasurements(UUID key);
 
-
+    List<Measurement> getCurrentMeasurementFromSensor();
 
 }

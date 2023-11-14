@@ -4,7 +4,6 @@ package com.example.server_weather.service.impl;
 import com.example.server_weather.dto.MeasurementDto;
 import com.example.server_weather.exeption.MeasurementValidationException;
 import com.example.server_weather.model.entity.Measurement;
-
 import com.example.server_weather.model.entity.Sensor;
 import com.example.server_weather.repository.MeasurementRepository;
 import com.example.server_weather.repository.SensorRepository;
@@ -27,11 +26,11 @@ import java.util.UUID;
 @Service
 public class MeasurementServiceImpl implements MeasurementService {
 
-@Autowired
-    private MeasurementRepository measurementRepository;
     @Autowired
-private SensorRepository sensorRepository;
+    private MeasurementRepository measurementRepository;
 
+    @Autowired
+    private SensorRepository sensorRepository;
 
     @Override
     public void addMeasurement(UUID sensorKey, MeasurementDto measurementDto) {
@@ -51,7 +50,7 @@ private SensorRepository sensorRepository;
             measurement.setTimestamp(LocalDateTime.now());
             measurement.setSensor(sensor.get());
             measurementRepository.save(measurement);
-            System.out.println("Send data: "+measurement);
+            System.out.println("Send data: " + measurement);
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid UUID : " + sensorKey);
         }
@@ -60,17 +59,21 @@ private SensorRepository sensorRepository;
     @Override
     public List<Measurement> getSensorMeasurements(UUID key) {
         Optional<Sensor> sensor = sensorRepository.findById(key);
-        if(sensor.isPresent()){
+        if (sensor.isPresent()) {
             return measurementRepository.findMeasurementBySensor(sensor.get());
-        }
-        else {
+        } else {
             throw new NoSuchElementException(String.format("Sensor with key '%s' don't exist", key));
         }
+    }
 
-
-
-
+    @Override
+    public List<Measurement> getCurrentMeasurementFromSensor() {
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime oneMinuteAgo = currentTime.minusMinutes(1);
+        return measurementRepository.findMeasurementLaterDateTime(oneMinuteAgo);
     }
 
 
 }
+
+

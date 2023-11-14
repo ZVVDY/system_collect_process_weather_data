@@ -2,17 +2,17 @@ package com.example.server_weather.service.impl;
 
 
 import com.example.server_weather.dto.RegistrationSensorResponseDto;
-import com.example.server_weather.exeption.SensorRegistrationException;
 import com.example.server_weather.dto.SensorRegistrationDto;
+import com.example.server_weather.exeption.SensorRegistrationException;
 import com.example.server_weather.model.entity.Sensor;
 import com.example.server_weather.repository.SensorRepository;
-import com.example.server_weather.service.MeasurementService;
 import com.example.server_weather.service.SensorService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -22,8 +22,6 @@ public class SensorServiceImpl implements SensorService {
 
     @Autowired
     private SensorRepository sensorRepository;
-
-    private boolean activated;
 
     public UUID saveSensorToServer(SensorRegistrationDto dto) {
         String name = dto.getName();
@@ -39,40 +37,13 @@ public class SensorServiceImpl implements SensorService {
         sensorRepository.save(sensor);
         RegistrationSensorResponseDto response = new RegistrationSensorResponseDto();
         response.setSensorKey(sensor.getSensorKey());
-        return  response.getSensorKey();
+        return response.getSensorKey();
 
     }
 
-//    @Override
-//    public List<Sensor> getAllActiveSensors() {
-//        return null;
-//    }
-
-//    @Override
-//    public boolean isSensorActive(Long id) {
-//        try {
-//            Sensor sensor = sensorRepository.getReferenceById(id);
-//
-//            sensor.setActive(sensorRepository.existsByActive());
-///**
-// *
-// */
-//            if (true){
-//                return true;
-//            }
-//            else {
-//                return false;
-//
-//
-//            }
-//
-//        }
-//        catch (Exception e){
-//
-//        }
-//
-//        return false;
-//    }
-
+    @Override
+    public List<Sensor> getAllActiveSensors() {
+        return sensorRepository.findByActiveIsTrue();
+    }
 
 }
