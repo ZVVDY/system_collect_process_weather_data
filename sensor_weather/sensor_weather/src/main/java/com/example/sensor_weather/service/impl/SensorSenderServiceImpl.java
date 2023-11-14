@@ -2,6 +2,7 @@ package com.example.sensor_weather.service.impl;
 
 
 import com.example.sensor_module.dto.SensorRegistrationDto;
+import com.example.sensor_weather.dto.MeasurementDto;
 import com.example.sensor_weather.dto.RegistrationSensorResponseDto;
 import com.example.sensor_weather.service.SensorSenderService;
 import jakarta.annotation.PostConstruct;
@@ -60,11 +61,12 @@ public class SensorSenderServiceImpl implements SensorSenderService {
             HttpEntity<SensorRegistrationDto> entity = new HttpEntity<>(sensorRegistrationDto, headers);
             ResponseEntity<RegistrationSensorResponseDto> response = restTemplate.postForEntity(serverUrl, entity, RegistrationSensorResponseDto.class);
 
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.CREATED) {
                 RegistrationSensorResponseDto responseBody = response.getBody();
-                sensorKey = responseBody.getKey(); // Получаем ключ с сервера
+                sensorKey = responseBody.getSensorKey(); // Получаем ключ с сервера
                 System.out.println("Sensor registered. Key: " + sensorKey);
-            } else {
+            }
+            else {
                 System.out.println("Failed to register sensor.");
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -77,32 +79,34 @@ public class SensorSenderServiceImpl implements SensorSenderService {
     }
 
     private void sendWeatherData() {
-        RestTemplate restTemplate = new RestTemplate();
-        String serverUrl = serverIP + "/sensors/" + sensorKey + "/measurements";
+        if (sensorKey != null) {
+            RestTemplate restTemplate = new RestTemplate();
+            String serverUrl = serverIP + "/sensors/" + sensorKey + "/measurements";
 
-        double temperature = generateRandomTemperature();
-        boolean raining = generateRandomRaining();
+            double temperature = generateRandomTemperature();
+            boolean raining = generateRandomRaining();
+MeasurementDto measurementDto = new MeasurementDto();
+measurementDto.setValue(temperature);
+measurementDto.setRaining(raining);
+            //String jsonData = "{ \"value\": " + temperature + ", \"raining\": " + raining + " }";
 
-        String jsonData = "{ \"value\": " + temperature + ", \"raining\": " + raining + " }";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonData, headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, entity, String.class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                System.out.println("Data sent to server: " + jsonData);
-            } else {
-                System.out.println("Failed to send data to the server.");
+                        try {
+                HttpEntity<MeasurementDto> entity = new HttpEntity<>(measurementDto, headers);
+                ResponseEntity<MeasurementDto> response = restTemplate.postForEntity(serverUrl, entity, MeasurementDto.class);
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    System.out.println("Data sent to server: " + measurementDto);
+                } else {
+                    System.out.println("Failed to send data to the server.");
+                }
+            } catch (HttpServerErrorException e) {
+                throw new HttpServerErrorException(HttpStatus.BAD_REQUEST);
             }
-        } catch (HttpServerErrorException e) {
-            throw new HttpServerErrorException(HttpStatus.BAD_REQUEST);
+
         }
-
     }
-
     @PostConstruct
     public void simulateSensorData() {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();

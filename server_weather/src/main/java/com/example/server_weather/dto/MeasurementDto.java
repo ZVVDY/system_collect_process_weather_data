@@ -8,6 +8,7 @@ import lombok.*;
 
 @Setter
 @Getter
+@Data
 public class MeasurementDto {
     @NotNull(message = "Value cannot be null")
     @DecimalMin(value = "-100", message = "Value must be greater than or equal to -100")
