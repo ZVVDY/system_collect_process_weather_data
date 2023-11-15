@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MeasurementService {
 
-   void addMeasurement(UUID key, MeasurementDto measurementDto);
+   Object addMeasurement(UUID key, MeasurementDto measurementDto);
 
     List<Measurement> getSensorMeasurements(UUID key);
 

@@ -33,7 +33,7 @@ public class MeasurementServiceImpl implements MeasurementService {
     private SensorRepository sensorRepository;
 
     @Override
-    public void addMeasurement(UUID sensorKey, MeasurementDto measurementDto) {
+    public Object addMeasurement(UUID sensorKey, MeasurementDto measurementDto) {
         Optional<Sensor> sensor = sensorRepository.findById(sensorKey);
         try {
             if (sensor.isEmpty()) {
@@ -54,6 +54,7 @@ public class MeasurementServiceImpl implements MeasurementService {
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid UUID : " + sensorKey);
         }
+        return null;
     }
 
     @Override
