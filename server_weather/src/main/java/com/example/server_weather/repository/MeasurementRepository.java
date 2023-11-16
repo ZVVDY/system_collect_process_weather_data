@@ -15,10 +15,10 @@ import java.util.Set;
 @Repository
 public interface MeasurementRepository extends JpaRepository<Measurement, Long> {
 
-    @Query("select w from Measurement w where w.sensor = ?1 order by w.timestamp desc limit 20")
+    @Query("SELECT w FROM Measurement w WHERE w.sensor = ?1 ORDER BY w.timestamp DESC limit 20")
     List<Measurement> findMeasurementBySensor(Sensor sensor);
 
-    @Query("select w from Measurement w where w.timestamp >= ?1")
+    @Query("SELECT w FROM Measurement w WHERE w.timestamp >= ?1")
     List<Measurement> findMeasurementLaterDateTime(LocalDateTime time);
 
     Optional<Measurement> findMeasurementBySensorOrderByTimestampDesc(Sensor sensor);
