@@ -1,10 +1,8 @@
 package com.example.sensor_weather.service.impl;
 
-
-import com.example.sensor_module.dto.SensorRegistrationDto;
 import com.example.sensor_weather.dto.MeasurementDto;
 import com.example.sensor_weather.dto.RegistrationSensorResponseDto;
-import com.example.sensor_weather.service.SensorSenderService;
+import com.example.sensor_weather.dto.SensorRegistrationDto;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +19,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.sensor_module.sensors.SensorNameConst.NAME_SENSOR_1;
+import static com.example.sensor_weather.conf.SensorNameConst.NAME_SENSOR_1;
 
 @Setter
 @Getter
 @RequiredArgsConstructor
 @Service
-public class SensorSenderServiceImpl implements SensorSenderService {
+public class SensorSenderServiceImpl {
 
-    private SensorSenderService sensorSenderService;
-    private double value;
-    private boolean raining;
-    private boolean activated;
     private UUID sensorKey;
 
     private String serverIP = "http://localhost:8081";
 
     private Random random = new Random();
-
-    public SensorSenderServiceImpl(SensorSenderService sensorSenderService) {
-        this.sensorSenderService = sensorSenderService;
-
-    }
 
     @PostConstruct
     public void registerSensor() {
@@ -63,10 +52,9 @@ public class SensorSenderServiceImpl implements SensorSenderService {
 
             if (response.getStatusCode() == HttpStatus.CREATED) {
                 RegistrationSensorResponseDto responseBody = response.getBody();
-                sensorKey = responseBody.getSensorKey(); // Получаем ключ с сервера
+                sensorKey = responseBody.getSensorKey();
                 System.out.println("Sensor registered. Key: " + sensorKey);
-            }
-            else {
+            } else {
                 System.out.println("Failed to register sensor.");
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -85,15 +73,13 @@ public class SensorSenderServiceImpl implements SensorSenderService {
 
             double temperature = generateRandomTemperature();
             boolean raining = generateRandomRaining();
-MeasurementDto measurementDto = new MeasurementDto();
-measurementDto.setValue(temperature);
-measurementDto.setRaining(raining);
-            //String jsonData = "{ \"value\": " + temperature + ", \"raining\": " + raining + " }";
-
+            MeasurementDto measurementDto = new MeasurementDto();
+            measurementDto.setValue(temperature);
+            measurementDto.setRaining(raining);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-                        try {
+            try {
                 HttpEntity<MeasurementDto> entity = new HttpEntity<>(measurementDto, headers);
                 ResponseEntity<MeasurementDto> response = restTemplate.postForEntity(serverUrl, entity, MeasurementDto.class);
                 if (response.getStatusCode() == HttpStatus.OK) {
@@ -107,6 +93,7 @@ measurementDto.setRaining(raining);
 
         }
     }
+
     @PostConstruct
     public void simulateSensorData() {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -114,98 +101,14 @@ measurementDto.setRaining(raining);
     }
 
     private int getRandomInterval() {
-        return random.nextInt(12) + 3; // Рандомный интервал от 3 до 15
+        return random.nextInt(12) + 3;
     }
 
-
-//    public void sendDataToServer() {
-//        if (activated) {
-//            String serverUrl = serverIP + "/sensors/" + sensorKey + "/measurements";
-//
-//            double temperatureValue = generateRandomTemperature(); // Генерация случайной температуры
-//            boolean isRaining = generateRandomRaining(); // Генерация случайного значения дождя
-//
-//            // Создание JSON
-//            String jsonData = "{ \"value\": " + temperatureValue + ", \"raining\": " + isRaining + " }";
-//
-//            RestTemplate restTemplate = new RestTemplate();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//            // Создание запроса
-//            HttpEntity<String> entity = new HttpEntity<>(jsonData, headers);
-//
-//            // Отправка POST-запроса на сервер
-//            ResponseEntity<String> response = restTemplate.exchange(serverUrl, HttpMethod.POST, entity, String.class);
-//
-//            if (response.getStatusCode() == HttpStatus.OK) {
-//                System.out.println("Data sent to the server.");
-//            } else {
-//                System.out.println("Failed to send data to the server.");
-//            }
-//        } else {
-//            System.out.println("Sensor is not activated.");
-//        }
-//    }
-
-    // Генерация случайного значения температуры
     private double generateRandomTemperature() {
-        return Math.random() * 200 - 100; // Возвращает значение в диапазоне от -100 до 100
+        return Math.random() * 200 - 100;
     }
 
-    // Генерация случайного значения дождя
     private boolean generateRandomRaining() {
-        return Math.random() < 0.5; // Возвращает случайное булево значение
+        return Math.random() < 0.5;
     }
-
-    public double getTemperature() {
-        if (activated) {
-            value = Math.random() * 100;
-        } else {
-            System.out.println("Sensor is not activated.");
-        }
-        return value;
-    }
-
-    public void activate() {
-        this.activated = true;
-        System.out.println("Sensor activated.");
-    }
-
-    public void deactivate() {
-        this.activated = false;
-        System.out.println("Sensor deactivated.");
-    }
-//    @Override
-//    public List<Sensor> getAllActiveSensors() {
-//        return null;
-//    }
-
-//    @Override
-//    public boolean isSensorActive(Long id) {
-//        try {
-//            Sensor sensor = sensorRepository.getReferenceById(id);
-//
-//            sensor.setActive(sensorRepository.existsByActive());
-///**
-// *
-// */
-//            if (true){
-//                return true;
-//            }
-//            else {
-//                return false;
-//
-//
-//            }
-//
-//        }
-//        catch (Exception e){
-//
-//        }
-//
-//        return false;
-//    }
-
-
 }

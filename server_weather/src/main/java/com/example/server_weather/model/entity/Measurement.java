@@ -25,5 +25,4 @@ public class Measurement {
     private boolean raining;
     @Schema(description = "Значение текущего мремени измерения")
     private LocalDateTime timestamp;
-
 }

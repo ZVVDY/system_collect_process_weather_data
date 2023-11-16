@@ -33,7 +33,7 @@ public class MeasurementServiceImpl implements MeasurementService {
     private SensorRepository sensorRepository;
 
     @Override
-    public Object addMeasurement(UUID sensorKey, MeasurementDto measurementDto) {
+    public Measurement addMeasurement(UUID sensorKey, MeasurementDto measurementDto) {
         Optional<Sensor> sensor = sensorRepository.findById(sensorKey);
         try {
             if (sensor.isEmpty()) {
@@ -51,10 +51,11 @@ public class MeasurementServiceImpl implements MeasurementService {
             measurement.setSensor(sensor.get());
             measurementRepository.save(measurement);
             System.out.println("Send data: " + measurement);
+            return measurement;
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid UUID : " + sensorKey);
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -73,8 +74,6 @@ public class MeasurementServiceImpl implements MeasurementService {
         LocalDateTime oneMinuteAgo = currentTime.minusMinutes(1);
         return measurementRepository.findMeasurementLaterDateTime(oneMinuteAgo);
     }
-
-
 }
 
 
