@@ -23,6 +23,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 
     Optional<Measurement> findMeasurementBySensorOrderByTimestampDesc(Sensor sensor);
 
-    @Query("select w.sensor from Measurement w where w.sensor not in (select w1.sensor from Measurement w1 where w1.sensor.active = false or w1.timestamp >= ?1)")
+    @Query("SELECT DISTINCT w.sensor FROM Measurement w LEFT JOIN Measurement w1 ON w.sensor = w1.sensor AND " +
+            "(w1.sensor.active = false OR w1.timestamp >= ?1) WHERE w1.sensor IS NULL")
     Set<Sensor> findWeatherSensorWitchNeedDeactivated(LocalDateTime time);
 }

@@ -25,22 +25,13 @@ import static com.example.sensor_weather.conf.SensorNameConst.NAME_SENSOR_1;
 @Getter
 @RequiredArgsConstructor
 @Service
-public class SensorSenderServiceImpl implements SensorSenderService {
+public class SensorSenderServiceImpl {
 
-    private SensorSenderService sensorSenderService;
-    private double value;
-    private boolean raining;
-    private boolean activated;
     private UUID sensorKey;
 
     private String serverIP = "http://localhost:8081";
 
     private Random random = new Random();
-
-    public SensorSenderServiceImpl(SensorSenderService sensorSenderService) {
-        this.sensorSenderService = sensorSenderService;
-
-    }
 
     @PostConstruct
     public void registerSensor() {
@@ -61,7 +52,7 @@ public class SensorSenderServiceImpl implements SensorSenderService {
 
             if (response.getStatusCode() == HttpStatus.CREATED) {
                 RegistrationSensorResponseDto responseBody = response.getBody();
-                sensorKey = responseBody.getSensorKey(); // Получаем ключ с сервера
+                sensorKey = responseBody.getSensorKey();
                 System.out.println("Sensor registered. Key: " + sensorKey);
             } else {
                 System.out.println("Failed to register sensor.");
@@ -108,13 +99,16 @@ public class SensorSenderServiceImpl implements SensorSenderService {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(this::sendWeatherData, 0, getRandomInterval(), TimeUnit.SECONDS);
     }
+
     private int getRandomInterval() {
         return random.nextInt(12) + 3;
     }
+
     private double generateRandomTemperature() {
-        return Math.random() * 200 - 100; // Возвращает значение в диапазоне от -100 до 100
+        return Math.random() * 200 - 100;
     }
+
     private boolean generateRandomRaining() {
-        return Math.random() < 0.5; // Возвращает случайное булево значение
+        return Math.random() < 0.5;
     }
 }
